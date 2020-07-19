@@ -27,7 +27,7 @@ def find_empty(bo):
         for j in range(len(bo[0])):
             if bo[i][j] == 0:
                 return (i, j)
-    return None
+    return False
 
 
 def validify(bo, num, loc):
@@ -44,11 +44,21 @@ def validify(bo, num, loc):
     return True
 
 def recurse(bo):
-    position = find_empty(bo)
-    for i in range(0,10):
-        if validify(bo, i, position):
-            bo[position[0]][position[1]] = i
+    # doesnt find anything
+    if not find_empty(bo):
+        return True #if solution is done 
+    else:
+        position = find_empty(bo)#finds empty position (row, col)
+        for i in range(1,10): #goes through combination of 9
+            if validify(bo, i, position): #if the combo follows the rule in the empty location
+                bo[position[0]][position[1]] = i  #new location becomes the number
+                if recurse(bo): #recurses through function (will return True if combo is done)
+                    return True #if solution is done
+                bo[position[0]][position[1]] = 0
+    return False #ends if no possible combination
 
 
-recurse(board)
-print_out(board)
+if recurse(board):
+    print_out(board)
+else:
+    print("no viable solution")
