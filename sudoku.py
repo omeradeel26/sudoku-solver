@@ -31,17 +31,24 @@ def find_empty(bo):
 
 
 def validify(bo, num, loc):
-    for i in range(bo[0]):
+    for i in range(len(bo[0])):
         if num == bo[loc[0]][i]:
             return False
-    for i in range(bo):
+    for i in range(len(bo[0])):
         if num == bo[i][loc[1]]:
             return False 
-    for i in range((pos[0]%3)*3,pos[0]%3)*3 +3):
-        for j in range((pos[1]%3)*3,(pos[1]%3)*3+3):
+    for i in range((loc[0]//3)*3,(loc[0]//3)*3 +3):
+        for j in range((loc[1]//3)*3,(loc[1]//3)*3+3):
             if num == bo[i][j]:
                 return False
     return True
 
+def recurse(bo):
+    position = find_empty(bo)
+    for i in range(0,10):
+        if validify(bo, i, position):
+            bo[position[0]][position[1]] = i
 
-print(validify(board, 2, find_empty(board)))
+
+recurse(board)
+print_out(board)
