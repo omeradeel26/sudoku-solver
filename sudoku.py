@@ -26,7 +26,22 @@ def find_empty(bo):
     for i in range(len(bo)):
         for j in range(len(bo[0])):
             if bo[i][j] == 0:
-                return i
+                return (i, j)
+    return None
 
-print_out(board)
-find_empty(board)
+
+def validify(bo, num, loc):
+    for i in range(bo[0]):
+        if num == bo[loc[0]][i]:
+            return False
+    for i in range(bo):
+        if num == bo[i][loc[1]]:
+            return False 
+    for i in range((pos[0]%3)*3,pos[0]%3)*3 +3):
+        for j in range((pos[1]%3)*3,(pos[1]%3)*3+3):
+            if num == bo[i][j]:
+                return False
+    return True
+
+
+print(validify(board, 2, find_empty(board)))
