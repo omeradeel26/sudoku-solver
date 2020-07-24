@@ -1,9 +1,5 @@
 import random
-import  pygame
-
-pygame.init()
-
-screen =  pygame.display.set_mode((800,600))
+from gui import *
 
 def random_generate():
     grid = [[0 for x in range(9)] for y in range(9)]
