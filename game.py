@@ -2,111 +2,80 @@ import pygame as p #import pygame... allows us to create GUI
 import copy #import copy... allows for hardcopying variables
 from solver import solve, generate #import solve function and generating board function
 
-WIDTH = HEIGHT = 800 #set height and width 
-MARGIN = 100 #margin around board
+SIZE = 800 #set height and width 
+MARGIN = 75 #margin around board
 
-ROWS = 9 #num of rows
-COLS = 9 #num of columns
+SQUARES = 9 #num of squares per side
+SECTION = SQUARES//3 #num of sections per side
 
-SQ_WIDTH = (WIDTH - MARGIN*2)//ROWS #WIDTH of one square 
-SQ_HEIGTH = (WIDTH - MARGIN*2)//ROWS #Height of one squre
+SECTION_SIZE = (SIZE - MARGIN * 2)/ SECTION #WIDTH of one section
+SQ_SIZE = (SIZE - MARGIN*2)/ SQUARES #WIDTH of one square 
 
-SCREEN =  p.display.set_mode((WIDTH,HEIGHT))
-ICON = p.image.load('imgs/logo.png')
+p.init() #initilizes GUI
 
-p.display.set_caption("Sudoku")
-p.display.set_icon(ICON)
+SCREEN =  p.display.set_mode((SIZE, SIZE)) #initializes screen
+ICON = p.image.load('imgs/logo.png') #loads logo for game
 
-FONT = pygame.font.SysFont("calibri", 35)
+p.display.set_caption("Sudoku") #sets screen title 
+p.display.set_icon(ICON) #sets logo for game
 
-running = True
+FONTSIZE = int((SIZE - MARGIN*2) *0.06)
+FONT = p.font.SysFont("calibri", FONTSIZE) #imports font & fontsize used for game
+ 
+class GameBoard: #Gameboard class for the board
+    def __init__(self): #initializes attributes of board
+        self.board = generate() #randomizes board
+         
+    def DrawBoard(self): #draws out board
+        #DRAWING OUTLINE OF SECTIONS
+        increment = MARGIN #increment by size of one square each time
+        for i in range(SECTION + 1): #times to add a solid border for sections
+           p.draw.line(SCREEN, (0,0,0), (MARGIN, increment), (SIZE - MARGIN, increment), 3) #draw horizontal line
+           p.draw.line(SCREEN, (0,0,0), (increment, MARGIN),(increment, SIZE - MARGIN), 3) #draw vertical line
+           increment += SECTION_SIZE #increase size of incrememnt each time
+        
+        #DRAWING OUTLINE FOR SQUARES
+        increment = MARGIN #starts off halfway in first square
+        for i in range(SQUARES + 1):
+            p.draw.line(SCREEN, (0,0,0), (MARGIN, increment), (SIZE - MARGIN, increment)) #draw horizontal line
+            p.draw.line(SCREEN, (0,0,0), (increment, MARGIN),(increment, SIZE - MARGIN)) #draw vertical line
+            increment += SQ_SIZE #increase size of incrememnt each time
 
-class game:
-    def __init__(self):
-        pass
+        increment_y = increment_x = MARGIN + SQ_SIZE//2 
+        
+        #DRAWING OUT NUMBERS
+        for row in range(len(self.board)): #loops through all rows in board
+            for col in range(len(self.board[0])): #loops through all columns in board
+                if self.board[row][col] != 0: #if board does not contain 
+                    text = FONT.render(str(self.board[row][col]), True, (0, 0, 0))
+                    textRect = text.get_rect()
+                    textRect.center = (increment_x, increment_y)
+                    SCREEN.blit(text, textRect)                
+                increment_x += SQ_SIZE
+            increment_x = MARGIN + SQ_SIZE//2 
+            increment_y += SQ_SIZE
+        increment_y = MARGIN + SQ_SIZE//2             
+        
+def main():
+    running = True #var to control and run Pygame 
+    sudoku = GameBoard()
 
-p.init()
+    while running:
+        for event in p.event.get():
+            if event.type == p.QUIT:
+                running = False    
+        #  if event.type == pygame.MOUSEBUTTONDOWN:
+        #      if getLocation(pygame.mouse.get_pos(),board) != False:
+        #         rowg, colg = getLocation(pygame.mouse.get_pos(),board)
+        #         filled = EmptyBox(rowg, colg, board[rowg][colg])  
+        # if event.type == pygame.KEYDOWN:
+        #     if event.key == 'K_BACKSPACE':
+        #         filled.num = ''
+        #     else:
+            #       filled.placement(event.unicode)
+        SCREEN.fill((255,255,255))
+        sudoku.DrawBoard()
+        p.display.flip()
 
-allnum = ["1","2","3","4","5","6","7","8","9"]
-
-def getLocation(loc, grid):
-    if loc[0] > margin and loc[0] < 800-margin and loc[1] > margin and loc[1] < 800-margin:
-        col = (loc[0]-margin)//((800-(margin*2))//9)
-        row = (loc[1]-margin)//((800-(margin*2))//9)
-        if grid[row][col] == 0:
-            return row, col
-        return False
-    return False
-
-def drawGrid(grid):
-    incr = margin
-
-    for i in range(4):
-       pygame.draw.line(screen, (0,0,0),(margin,incr),(800-margin,incr), 3)
-       pygame.draw.line(screen, (0,0,0), (incr,margin),(incr,800-margin), 3)
-       incr += (800-margin*2)//3
-    
-    incr = margin
-
-    for i in range(1,7):
-        if i == 3 or i==5:
-            incr += ((800-margin*2)//9)*2
-        else: 
-            incr += (800-margin*2)//9
-        pygame.draw.line(screen, (0,0,0),(margin,incr),(800-margin,incr))
-        pygame.draw.line(screen, (0,0,0),(incr,margin),(incr,800-margin))
-
-    incr_x = margin + (800-margin*2)//18
-    incr_y = margin + (800-margin*2)//18
-
-    for i in range (len(grid)):
-        for j in range (len(grid[0])):
-            if grid[i][j] != 0:
-                text = font.render(str(board[i][j]), True, (0, 0, 0))
-                textRect = text.get_rect()
-                textRect.center = (incr_x, incr_y)
-                screen.blit(text, textRect)
-            incr_x += (800-margin*2)//9
-        incr_x = margin + (800-margin*2)//18
-        incr_y += (800-margin*2)//9
-    incr_y = margin + (800-margin*2)//18   
-
-class EmptyBox:
-    def __init__(self, row, col, num):
-        self.num = ''
-        self.location = (margin + (row*((800-margin*2)//9)) + (800-margin*2)//18, margin + (col*((800-margin*2)//9)) + (800-margin*2)//18)
-        self.active = True
-
-    def placement(self, num):
-        if self.active and num in allnum:
-            print(self.location[0],(self.location[1]))
-            self.num = num
-            text = font.render(num, True, (0, 0, 0))
-            screen.blit(text,(self.location[0],self.location[1]))
-        else: 
-            active = False
-
-board = generate()
-new = copy.deepcopy(board)
-
-while not solve(new): 
-    board = generate()
-    new = copy.deepcopy(board)  
-
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False    
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            if getLocation(pygame.mouse.get_pos(),board) != False:
-               rowg, colg = getLocation(pygame.mouse.get_pos(),board)
-               filled = EmptyBox(rowg, colg, board[rowg][colg])  
-        if event.type == pygame.KEYDOWN:
-            if event.key == 'K_BACKSPACE':
-                filled.num = ''
-            else:
-               filled.placement(event.unicode)
-
-    screen.fill((255,255,255))
-    drawGrid(board)
-    pygame.display.flip()
+if __name__=="__main__":
+    main()
