@@ -139,18 +139,7 @@ class Num:
 
     def addNumber(self, selection):
         self.selection = selection
-        if self.selection:
-
-class grid:
-    def __init__(self, margin, num_grid, direct, size):
-        self.margin = margin
-        self.margin = num_grid 
-        self.direct = direct
-        self.size = size
-    
-    def createSpacing(self):
-        
-        
+        if self.selection:        
 
 board= random_generate()
 new = copy.deepcopy(board)
